@@ -2,8 +2,10 @@ package lib
 
 type StatJS struct {
 	Json   string
-	Addr   string
-	Uagent string
+	Info struct {
+		Addr   string
+		Uagent string
+	}
 }
 
 type Configure struct {
@@ -15,6 +17,7 @@ type Configure struct {
 		Password string `json:"password"`
 		Address string `json:"address"`
 	} `json:"redis_ip"`
+	Psql string `json:"psql"`
 	Clickhouse string `json:"clickhouse"`
 }
 

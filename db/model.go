@@ -8,7 +8,7 @@ import (
 	"statistics/lib"
 	"statistics/system"
 	"strings"
-	"github.com/go-redis/redis"
+//	"github.com/go-redis/redis"
 )
 
 const dbClickhouseGoodQuery = "INSERT INTO statistics(point_id, played, md5, len) VALUES (?, ?, toFixedString(?, 32),  ?)"
@@ -35,7 +35,7 @@ func SendInfo(ip string, userAgent string, point string) {
 
 func SetRedis(statJS lib.StatJS) bool {
 	id := uuid.NewV4()
-	err := lib.RedisStatDB.Set(fmt.Sprint(id, "_ip:", statJS.Addr, "user_agent:", statJS.Uagent), statJS.Json, 0).Err()
+	err := lib.RedisStatDB.Set(fmt.Sprint(id, "_ip:", statJS.Info.Addr, "user_agent:", statJS.Info.Uagent), statJS.Json, 0).Err()
 	if err != nil {
 		log.Println("Redis set stat:", err)
 		return false
@@ -95,8 +95,8 @@ func GetStatFromRedis(toParse chan []lib.StatJS) {
 	for i, val := range valArr {
 		d := strings.Index(KeyDB[i], "ip:")
 		u := strings.Index(KeyDB[i], "user_agent")
-		stat.Addr = KeyDB[i][d+3 : u]
-		stat.Uagent = KeyDB[i][u+11:]
+		stat.Info.Addr = KeyDB[i][d+3 : u]
+		stat.Info.Uagent = KeyDB[i][u+11:]
 		stat.Json, err = system.CheckString(val)
 		if err != nil {
 			log.Println(err)

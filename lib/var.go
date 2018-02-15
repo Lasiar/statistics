@@ -10,4 +10,5 @@ var (
 	RedisStatDB *redis.Client
 	Config      Configure
 	ClickDB     *sql.DB
+	PsqlDB		*sql.DB
 )

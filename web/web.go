@@ -13,8 +13,8 @@ func Web(stat chan lib.StatJS) func(w http.ResponseWriter, r *http.Request) {
 		var statJS lib.StatJS
 		fmt.Fprint(w, `{"success":true}`)
 		statJS.Json = r.PostFormValue("data")
-		statJS.Addr = getRealAddr(r)
-		statJS.Uagent = r.UserAgent()
+		statJS.Info.Addr = getRealAddr(r)
+		statJS.Info.Uagent = r.UserAgent()
 		stat <- statJS
 	}
 }

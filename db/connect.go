@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/go-redis/redis"
 	"github.com/kshvakov/clickhouse"
+	_ "github.com/lib/pq"
 	"log"
 	"statistics/lib"
 )
@@ -32,6 +33,23 @@ func NewRedisIp() {
 		log.Println(err)
 	}
 }
+
+
+func NewPostSql() {
+	var err error
+	lib.PsqlDB, err = sql.Open("postgres", lib.Config.Psql)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if err := lib.PsqlDB.Ping(); err != nil {
+		if exception, ok := err.(*clickhouse.Exception); ok {
+			fmt.Printf("[%d] %s \n%s\n", exception.Code, exception.Message, exception.StackTrace)
+		} else {
+			fmt.Println(err)
+		}
+	}
+}
+
 
 func NewClick() {
 	var err error

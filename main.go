@@ -15,7 +15,7 @@ func init() {
 	db.NewRedisStat()
 	db.NewRedisIp()
 	db.NewClick()
-
+	db.NewPostSql()
 }
 
 func main() {
