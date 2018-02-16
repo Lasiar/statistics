@@ -21,3 +21,10 @@ func MakeInfoPoint(js lib.RawJS, statJS lib.StatJS) lib.InfoPoint {
 	inf.Uagent = statJS.Info.Uagent
 	return inf
 }
+
+func MakeBadJS(stat lib.StatJS) lib.BadJS {
+	var bad lib.BadJS
+	bad.Json = stat.Json
+	bad.Ip = stat.Info.Addr
+	return bad
+}

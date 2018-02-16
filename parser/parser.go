@@ -10,36 +10,38 @@ import (
 	"strings"
 )
 
-func Parse(statArray []lib.StatJS, statChannel chan []lib.ValidJS, sendInfoPoint chan lib.InfoPoint) {
+func Parse(statArray []lib.StatJS, statChannel chan []lib.ValidJS, sendInfoPoint chan lib.InfoPoint, sendBadDB chan lib.BadJS) {
 	for _, stat := range statArray {
 		js, err := unmarshalJS(stat.Json)
 		if err != nil {
 			log.Println(err)
+			sendBadDB  <- system.MakeBadJS(stat)
 			return
 		}
 
-		infoPoint := system.MakeInfoPoint(js, stat)
-		sendInfoPoint <- infoPoint
+		sendInfoPoint <- system.MakeInfoPoint(js, stat)
 
 		err = validInterfaceJS(js.Statistics)
 		if err != nil {
 			log.Println(err)
+			sendBadDB  <- system.MakeBadJS(stat)
 			return
 		}
 		readyJs, err := changeType(js)
 		if err != nil {
 			log.Println(err)
+			sendBadDB  <- system.MakeBadJS(stat)
 			return
 		}
 		statChannel <- readyJs
 	}
 }
 
-func ParserWithoutRedis(stat lib.StatJS, statChannel chan []lib.ValidJS, sendInfoPoint chan lib.InfoPoint) {
-	//	defer send bad
+func ParserWithoutRedis(stat lib.StatJS, statChannel chan []lib.ValidJS, sendInfoPoint chan lib.InfoPoint,sendBadDB chan lib.BadJS) {
 	js, err := unmarshalJS(stat.Json)
 	if err != nil {
 		log.Println(err)
+		sendBadDB  <- system.MakeBadJS(stat)
 		return
 	}
 
@@ -49,11 +51,13 @@ func ParserWithoutRedis(stat lib.StatJS, statChannel chan []lib.ValidJS, sendInf
 	err = validInterfaceJS(js.Statistics)
 	if err != nil {
 		log.Println(err)
+		sendBadDB  <- system.MakeBadJS(stat)
 		return
 	}
 	readyJs, err := changeType(js)
 	if err != nil {
 		log.Println(err)
+		sendBadDB  <- system.MakeBadJS(stat)
 		return
 	}
 	statChannel <- readyJs

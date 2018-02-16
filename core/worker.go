@@ -8,6 +8,27 @@ import (
 	"time"
 )
 
+func SendBadJson(ticker *time.Ticker, tickerTen *time.Ticker, badJsonChann chan lib.BadJS) {
+	var badJsonArray []lib.BadJS
+	badDBPing := db.CheckBadDB()
+	for {
+		select {
+		case s := <-badJsonChann:
+			badJsonArray = append(badJsonArray, s)
+		case <-ticker.C:
+			if len(badJsonArray) == 0 {
+				continue
+			}
+			if badDBPing {
+				badDBPing = db.SendToBadDB(badJsonArray)
+				badJsonArray = nil
+			}
+		case <-tickerTen.C:
+			badDBPing = db.CheckBadDB()
+		}
+	}
+}
+
 func ReceivingStatWorker(ticker *time.Ticker, halfTicker *time.Ticker, stat chan lib.StatJS, sendParse chan lib.StatJS, forParse chan []lib.StatJS) {
 	redisPing := db.CheckRedis()
 	for {
@@ -53,16 +74,16 @@ func SendRedisIp(ticker *time.Ticker, tenTicker *time.Ticker, infoPoint chan lib
 	}
 }
 
-func ParserWorker(ticker *time.Ticker, tenTicker *time.Ticker, stat chan lib.StatJS, statFromRedis chan []lib.StatJS, sendInfoPoint chan lib.InfoPoint) {
+func ParserWorker(ticker *time.Ticker, tenTicker *time.Ticker, stat chan lib.StatJS, statFromRedis chan []lib.StatJS, sendInfoPoint chan lib.InfoPoint, sendBadDB chan lib.BadJS) {
 	var arrayValidJS []lib.ValidJS
 	clickPing := db.CheckClick()
 	returnChannel := make(chan []lib.ValidJS)
 	for {
 		select {
 		case s := <-statFromRedis:
-			go parser.Parse(s, returnChannel, sendInfoPoint)
+			go parser.Parse(s, returnChannel, sendInfoPoint, sendBadDB)
 		case s := <-stat:
-			go parser.ParserWithoutRedis(s, returnChannel, sendInfoPoint)
+			go parser.ParserWithoutRedis(s, returnChannel, sendInfoPoint, sendBadDB)
 		case r := <-returnChannel:
 			arrayValidJS = append(arrayValidJS, r...)
 		case <-ticker.C:

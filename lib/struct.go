@@ -32,6 +32,11 @@ type RawJS struct {
 	Statistics [][]interface{} `json:"statistics"`
 }
 
+type BadJS struct {
+	Ip   string
+	Json string
+}
+
 type ValidJS struct {
 	Point    int
 	Datetime int64

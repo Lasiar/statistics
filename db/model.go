@@ -10,7 +10,10 @@ import (
 	"strings"
 )
 
-const dbClickhouseGoodQuery = "INSERT INTO statistics(point_id, played, md5, len) VALUES (?, ?, toFixedString(?, 32),  ?)"
+const (
+	dbClickhouseGoodQuery = "INSERT INTO statistics(point_id, played, md5, len) VALUES (?, ?, toFixedString(?, 32),  ?)"
+	dbClickhouseBadQuery  = `INSERT INTO badjson(ip, json) VALUES ($1, $2)`
+)
 
 func CheckRedis() bool {
 	_, err := lib.RedisStatDB.Ping().Result()
@@ -21,13 +24,26 @@ func CheckRedis() bool {
 	return true
 }
 
+func CheckBadDB() bool {
+	if err := lib.PsqlDB.Ping(); err != nil {
+		if exception, ok := err.(*clickhouse.Exception); ok {
+			fmt.Printf("[%d] %s \n%s\n", exception.Code, exception.Message, exception.StackTrace)
+			return false
+		} else {
+			log.Println("Error send badDB: ", err)
+			return false
+		}
+	}
+	return true
+}
+
 func CheckClick() bool {
 	if err := lib.ClickDB.Ping(); err != nil {
 		if exception, ok := err.(*clickhouse.Exception); ok {
 			log.Printf("[%d] %s \n%s\n", exception.Code, exception.Message, exception.StackTrace)
 			return false
 		} else {
-			log.Println(err)
+			log.Println("Error send click: ", err)
 			return false
 		}
 	}
@@ -64,6 +80,36 @@ func SetRedis(statJS lib.StatJS) bool {
 	err := lib.RedisStatDB.Set(fmt.Sprint(id, "_ip:", statJS.Info.Addr, "user_agent:", statJS.Info.Uagent), statJS.Json, 0).Err()
 	if err != nil {
 		log.Println("Redis set stat: ", err)
+		return false
+	}
+	return true
+}
+
+func SendToBadDB(badJsons []lib.BadJS) bool {
+	if err := lib.PsqlDB.Ping(); err != nil {
+		if exception, ok := err.(*clickhouse.Exception); ok {
+			fmt.Printf("[%d] %s \n%s\n", exception.Code, exception.Message, exception.StackTrace)
+			return false
+		} else {
+			return false
+		}
+	}
+	var (
+		tx, _ = lib.PsqlDB.Begin()
+	)
+	stmt, err := tx.Prepare(dbClickhouseBadQuery)
+	if err != nil {
+		log.Println(err)
+	}
+	for _, query := range badJsons {
+		if _, err := stmt.Exec(query.Ip,
+			query.Json); err != nil {
+			log.Println(err)
+			return false
+		}
+	}
+	if err := tx.Commit(); err != nil {
+		log.Println(err)
 		return false
 	}
 	return true
@@ -138,10 +184,10 @@ func GetStatFromRedis(toParse chan []lib.StatJS) {
 }
 
 /*
-func SendBadStatistic(js []lib.SendBad) {
+func SendBadStatistic(js []lib.BadJS) {
 	for _, jsonRaw := range js {
 		jsonStr, _ := json.Marshal(jsonRaw)
-		req, err := http.NewRequest("POST", lib.c, bytes.NewBuffer(jsonStr))
+		req, err := http.NewRequest("POST", lib., bytes.NewBuffer(jsonStr))
 	if err != nil {
 		return
 	}
@@ -154,4 +200,5 @@ func SendBadStatistic(js []lib.SendBad) {
 	}
 	defer resp.Body.Close()
 }
-}*/
+}
+*/
