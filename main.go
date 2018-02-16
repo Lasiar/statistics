@@ -8,10 +8,13 @@ import (
 	"statistics/lib"
 	"statistics/web"
 	"time"
+	"fmt"
+	"statistics/system"
 )
 
 func init() {
 	configure.Config()
+	system.Exit()
 	db.NewRedisStat()
 	db.NewRedisIp()
 	db.NewClick()
@@ -29,6 +32,8 @@ func main() {
 	sendInfoPoint := make(chan lib.InfoPoint)
 	sendBadDB := make(chan lib.BadJS)
 
+
+
 	go core.SendRedisIp(everHalfSecond, everTenSecond, sendInfoPoint)
 	go core.ReceivingStatWorker(everTenSecond, everHalfSecond, stat, sendInParse, statFromRedis)
 	go core.ParserWorker(everSecond, everTenSecond, sendInParse, statFromRedis, sendInfoPoint, sendBadDB)
@@ -37,6 +42,6 @@ func main() {
 	HandleWeb := web.Web(stat)
 
 	http.HandleFunc("/gateway/statistics/create", HandleWeb)
-	http.ListenAndServe(":8080", nil)
+	http.ListenAndServe(lib.Config.Port, nil)
+	fmt.Println("Listen: ", lib.Config.Port)
 }
-	
