@@ -1,11 +1,17 @@
 package lib
 
 type StatJS struct {
-	Json   string
+	Json string
 	Info struct {
 		Addr   string
 		Uagent string
 	}
+}
+
+type InfoPoint struct {
+	Point  int
+	Addr   string
+	Uagent string
 }
 
 type Configure struct {
@@ -13,11 +19,11 @@ type Configure struct {
 		Password string `json:"password"`
 		Address  string `json:"address"`
 	} `json:"redis"`
-	RedisIp struct{
+	RedisIp struct {
 		Password string `json:"password"`
-		Address string `json:"address"`
+		Address  string `json:"address"`
 	} `json:"redis_ip"`
-	Psql string `json:"psql"`
+	Psql       string `json:"psql"`
 	Clickhouse string `json:"clickhouse"`
 }
 

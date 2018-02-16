@@ -26,9 +26,11 @@ func main() {
 	stat := make(chan lib.StatJS)
 	sendInParse := make(chan lib.StatJS)
 	statFromRedis := make(chan []lib.StatJS)
+	sendInfoPoint := make(chan lib.InfoPoint)
 
+	go core.SendRedisIp(everHalfSecond, everTenSecond, sendInfoPoint)
 	go core.ReceivingStatWorker(everTenSecond, everHalfSecond, stat, sendInParse, statFromRedis)
-	go core.ParserWorker(everSecond, sendInParse, statFromRedis)
+	go core.ParserWorker(everSecond, everTenSecond, sendInParse, statFromRedis, sendInfoPoint)
 
 	HandleWeb := web.Web(stat)
 

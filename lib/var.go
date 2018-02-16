@@ -6,9 +6,9 @@ import (
 )
 
 var (
-	RedisIpDB	*redis.Client
+	RedisIpDB   *redis.Client
 	RedisStatDB *redis.Client
 	Config      Configure
 	ClickDB     *sql.DB
-	PsqlDB		*sql.DB
+	PsqlDB      *sql.DB
 )

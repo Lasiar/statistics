@@ -26,14 +26,13 @@ func NewRedisIp() {
 	lib.RedisIpDB = redis.NewClient(&redis.Options{
 		Addr:     lib.Config.RedisIp.Address,
 		Password: lib.Config.RedisIp.Password, // no password set
-		DB:       0,                         // use default DB
+		DB:       0,                           // use default DB
 	})
 	_, err := lib.RedisStatDB.Ping().Result()
 	if err != nil {
 		log.Println(err)
 	}
 }
-
 
 func NewPostSql() {
 	var err error
@@ -49,7 +48,6 @@ func NewPostSql() {
 		}
 	}
 }
-
 
 func NewClick() {
 	var err error

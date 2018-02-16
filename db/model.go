@@ -8,7 +8,6 @@ import (
 	"statistics/lib"
 	"statistics/system"
 	"strings"
-//	"github.com/go-redis/redis"
 )
 
 const dbClickhouseGoodQuery = "INSERT INTO statistics(point_id, played, md5, len) VALUES (?, ?, toFixedString(?, 32),  ?)"
@@ -22,22 +21,49 @@ func CheckRedis() bool {
 	return true
 }
 
-func SendInfo(ip string, userAgent string, point string) {
-	err := lib.RedisIpDB.Set(fmt.Sprint(point, "_ip"), ip, 0).Err()
+func CheckClick() bool {
+	if err := lib.ClickDB.Ping(); err != nil {
+		if exception, ok := err.(*clickhouse.Exception); ok {
+			log.Printf("[%d] %s \n%s\n", exception.Code, exception.Message, exception.StackTrace)
+			return false
+		} else {
+			log.Println(err)
+			return false
+		}
+	}
+	return true
+}
+
+func CheckIpRedis() bool {
+	_, err := lib.RedisIpDB.Ping().Result()
 	if err != nil {
 		log.Println(err)
+		return false
 	}
-	err = lib.RedisIpDB.Set(fmt.Sprint(point, "_user"), userAgent, 0).Err()
-	if err != nil {
-		log.Println(err)
+	return true
+}
+
+func SendInfo(infoPointArr []lib.InfoPoint) (bool, error) {
+	for _, infoPoint := range infoPointArr {
+		err := lib.RedisIpDB.Set(fmt.Sprint(infoPoint.Point, "_ip"), infoPoint.Addr, 0).Err()
+		if err != nil {
+			log.Println("Redis set ip: ", err)
+			return false, err
+		}
+		err = lib.RedisIpDB.Set(fmt.Sprint(infoPoint.Point, "_user"), infoPoint.Uagent, 0).Err()
+		if err != nil {
+			log.Println("Redis set uagent: ", err)
+			return false, err
+		}
 	}
+	return true, nil
 }
 
 func SetRedis(statJS lib.StatJS) bool {
 	id := uuid.NewV4()
 	err := lib.RedisStatDB.Set(fmt.Sprint(id, "_ip:", statJS.Info.Addr, "user_agent:", statJS.Info.Uagent), statJS.Json, 0).Err()
 	if err != nil {
-		log.Println("Redis set stat:", err)
+		log.Println("Redis set stat: ", err)
 		return false
 	}
 	return true
@@ -110,3 +136,22 @@ func GetStatFromRedis(toParse chan []lib.StatJS) {
 	}
 	toParse <- statArray
 }
+
+/*
+func SendBadStatistic(js []lib.SendBad) {
+	for _, jsonRaw := range js {
+		jsonStr, _ := json.Marshal(jsonRaw)
+		req, err := http.NewRequest("POST", lib.c, bytes.NewBuffer(jsonStr))
+	if err != nil {
+		return
+	}
+	req.Header.Set("X-Custom-Header", "myvalue")
+	req.Header.Set("Content-Type", "application/json")
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return
+	}
+	defer resp.Body.Close()
+}
+}*/

@@ -5,17 +5,22 @@ import (
 	"fmt"
 	"log"
 	"statistics/lib"
+	"statistics/system"
 	"strconv"
 	"strings"
 )
 
-func Parse(statArray []lib.StatJS, statChannel chan []lib.ValidJS) {
+func Parse(statArray []lib.StatJS, statChannel chan []lib.ValidJS, sendInfoPoint chan lib.InfoPoint) {
 	for _, stat := range statArray {
 		js, err := unmarshalJS(stat.Json)
 		if err != nil {
 			log.Println(err)
 			return
 		}
+
+		infoPoint := system.MakeInfoPoint(js, stat)
+		sendInfoPoint <- infoPoint
+
 		err = validInterfaceJS(js.Statistics)
 		if err != nil {
 			log.Println(err)
@@ -30,13 +35,17 @@ func Parse(statArray []lib.StatJS, statChannel chan []lib.ValidJS) {
 	}
 }
 
-func ParserWithoutRedis(stat lib.StatJS, statChannel chan []lib.ValidJS) {
+func ParserWithoutRedis(stat lib.StatJS, statChannel chan []lib.ValidJS, sendInfoPoint chan lib.InfoPoint) {
 	//	defer send bad
 	js, err := unmarshalJS(stat.Json)
 	if err != nil {
 		log.Println(err)
 		return
 	}
+
+	infoPoint := system.MakeInfoPoint(js, stat)
+	sendInfoPoint <- infoPoint
+
 	err = validInterfaceJS(js.Statistics)
 	if err != nil {
 		log.Println(err)
