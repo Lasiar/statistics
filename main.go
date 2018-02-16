@@ -39,3 +39,4 @@ func main() {
 	http.HandleFunc("/gateway/statistics/create", HandleWeb)
 	http.ListenAndServe(":8080", nil)
 }
+	
