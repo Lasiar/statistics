@@ -21,26 +21,23 @@ func SendInfo(infoPointArr []lib.InfoPoint) (bool, error) {
 	for _, infoPoint := range infoPointArr {
 		err := lib.RedisIpDB.Set(fmt.Sprint(infoPoint.Point, "_ip"), infoPoint.Addr, 0).Err()
 		if err != nil {
-			log.Println("Redis set ip: ", err)
-			return false, err
+			return false, fmt.Errorf("%v %v: ","Set ip addr", err)
 		}
 		err = lib.RedisIpDB.Set(fmt.Sprint(infoPoint.Point, "_user"), infoPoint.Uagent, 0).Err()
 		if err != nil {
-			log.Println("Redis set uagent: ", err)
-			return false, err
+			return false, fmt.Errorf("%v %v: ", "Set uagent", err)
 		}
 	}
 	return true, nil
 }
 
-func SetRedis(statJS lib.StatJS) bool {
+func SetRedis(statJS lib.StatJS) (bool, error) {
 	id := uuid.NewV4()
 	err := lib.RedisStatDB.Set(fmt.Sprint(id, "_ip:", statJS.Info.Addr, "user_agent:", statJS.Info.Uagent), statJS.Json, 0).Err()
 	if err != nil {
-		log.Println("Redis set stat: ", err)
-		return false
+		return false, fmt.Errorf("%v %v: ", "Set stat", err)
 	}
-	return true
+	return true, nil
 }
 
 func SendToBadDB(badJsons []lib.BadJS) bool {

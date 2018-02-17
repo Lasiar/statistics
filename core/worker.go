@@ -31,11 +31,15 @@ func SendBadJson(ticker *time.Ticker, tickerTen *time.Ticker, badJsonChann chan 
 
 func ReceivingStatWorker(ticker *time.Ticker, halfTicker *time.Ticker, stat chan lib.StatJS, sendParse chan lib.StatJS, forParse chan []lib.StatJS) {
 	redisPing := db.CheckRedis()
+	var err error
 	for {
 		select {
 		case s := <-stat:
 			if redisPing {
-				redisPing = db.SetRedis(s)
+				redisPing, err = db.SetRedis(s)
+				if err != nil {
+					log.Println("redis stat: ", err)
+				}
 			} else {
 				sendParse <- s
 			}
