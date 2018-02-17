@@ -10,6 +10,7 @@ import (
 
 func SendBadJson(ticker *time.Ticker, tickerTen *time.Ticker, badJsonChann chan lib.BadJS) {
 	var badJsonArray []lib.BadJS
+	var err error
 	badDBPing := db.CheckBadDB()
 	for {
 		select {
@@ -20,7 +21,10 @@ func SendBadJson(ticker *time.Ticker, tickerTen *time.Ticker, badJsonChann chan 
 				continue
 			}
 			if badDBPing {
-				badDBPing = db.SendToBadDB(badJsonArray)
+				badDBPing, err = db.SendToBadDB(badJsonArray)
+				if err != nil {
+					log.Println("Send bad stat:", err)
+				}
 				badJsonArray = nil
 			}
 		case <-tickerTen.C:
@@ -31,17 +35,24 @@ func SendBadJson(ticker *time.Ticker, tickerTen *time.Ticker, badJsonChann chan 
 
 func ReceivingStatWorker(ticker *time.Ticker, halfTicker *time.Ticker, stat chan lib.StatJS, sendParse chan lib.StatJS, forParse chan []lib.StatJS) {
 	redisPing := db.CheckRedis()
+	var err error
 	for {
 		select {
 		case s := <-stat:
 			if redisPing {
-				redisPing = db.SetRedis(s)
+				redisPing, err = db.SetRedis(s)
+				if err != nil {
+					log.Println("redis stat set: ", err)
+				}
 			} else {
 				sendParse <- s
 			}
 		case <-halfTicker.C:
 			if redisPing {
-				db.GetStatFromRedis(forParse)
+				err = db.GetStatFromRedis(forParse)
+				if err != nil {
+					log.Println("redis get stat:")
+				}
 			}
 		case <-ticker.C:
 			redisPing = db.CheckRedis()
