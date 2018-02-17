@@ -25,7 +25,7 @@ type Configure struct {
 	} `json:"redis_ip"`
 	Psql       string `json:"psql"`
 	Clickhouse string `json:"clickhouse"`
-	Port	string `json:"port"`
+	Port       string `json:"port"`
 }
 
 type RawJS struct {

@@ -15,13 +15,11 @@ const (
 	dbClickhouseBadQuery  = `INSERT INTO badjson(ip, json) VALUES ($1, $2)`
 )
 
-
-
 func SendInfo(infoPointArr []lib.InfoPoint) (bool, error) {
 	for _, infoPoint := range infoPointArr {
 		err := lib.RedisIpDB.Set(fmt.Sprint(infoPoint.Point, "_ip"), infoPoint.Addr, 0).Err()
 		if err != nil {
-			return false, fmt.Errorf("%v %v: ","Set ip addr", err)
+			return false, fmt.Errorf("%v %v: ", "Set ip addr", err)
 		}
 		err = lib.RedisIpDB.Set(fmt.Sprint(infoPoint.Point, "_user"), infoPoint.Uagent, 0).Err()
 		if err != nil {
@@ -43,7 +41,7 @@ func SetRedis(statJS lib.StatJS) (bool, error) {
 func SendToBadDB(badJsons []lib.BadJS) bool {
 	if err := lib.PsqlDB.Ping(); err != nil {
 		if exception, ok := err.(*clickhouse.Exception); ok {
-			fmt.Printf("[%d] %s \n%s\n", exception.Code, exception.Message, exception.StackTrace)
+			fmt.Errorf("[%d] %s \n%s\n", exception.Code, exception.Message, exception.StackTrace)
 			return false
 		} else {
 			return false
@@ -103,21 +101,20 @@ func SendToClick(array []lib.ValidJS) error {
 	return nil
 }
 
-func GetStatFromRedis(toParse chan []lib.StatJS) {
+func GetStatFromRedis(toParse chan []lib.StatJS) error {
 	var statArray []lib.StatJS
 	var stat lib.StatJS
 
 	KeyDB, err := lib.RedisStatDB.Keys("*ip:*").Result()
 	if err != nil {
-		log.Println(err)
+		return fmt.Errorf("%v", err)
 	}
 	if len(KeyDB) == 0 {
-		return
+		return nil
 	}
 	valArr, err := lib.RedisStatDB.MGet(KeyDB...).Result()
 	if err != nil {
-		log.Println(err)
-		return
+		return fmt.Errorf("%v", err)
 	}
 	for i, val := range valArr {
 		d := strings.Index(KeyDB[i], "ip:")
@@ -126,16 +123,16 @@ func GetStatFromRedis(toParse chan []lib.StatJS) {
 		stat.Info.Uagent = KeyDB[i][u+11:]
 		stat.Json, err = system.CheckString(val)
 		if err != nil {
-			log.Println(err)
-			return
+			return fmt.Errorf("%v", err)
 		}
 		statArray = append(statArray, stat)
 	}
 	lib.RedisStatDB.Del(KeyDB...).Err()
 	if err != nil {
-		log.Println(err)
+		return fmt.Errorf("%v", err)
 	}
 	toParse <- statArray
+	return nil
 }
 
 /*

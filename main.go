@@ -1,15 +1,15 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 	"statistics/configure"
 	"statistics/core"
 	"statistics/db"
 	"statistics/lib"
+	"statistics/system"
 	"statistics/web"
 	"time"
-	"fmt"
-	"statistics/system"
 )
 
 func init() {
@@ -31,8 +31,6 @@ func main() {
 	statFromRedis := make(chan []lib.StatJS)
 	sendInfoPoint := make(chan lib.InfoPoint)
 	sendBadDB := make(chan lib.BadJS)
-
-
 
 	go core.SendRedisIp(everHalfSecond, everTenSecond, sendInfoPoint)
 	go core.ReceivingStatWorker(everTenSecond, everHalfSecond, stat, sendInParse, statFromRedis)

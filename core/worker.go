@@ -38,14 +38,17 @@ func ReceivingStatWorker(ticker *time.Ticker, halfTicker *time.Ticker, stat chan
 			if redisPing {
 				redisPing, err = db.SetRedis(s)
 				if err != nil {
-					log.Println("redis stat: ", err)
+					log.Println("redis stat set: ", err)
 				}
 			} else {
 				sendParse <- s
 			}
 		case <-halfTicker.C:
 			if redisPing {
-				db.GetStatFromRedis(forParse)
+				 err = db.GetStatFromRedis(forParse)
+				 if err != nil {
+				 	log.Println("redis get stat:")
+				 }
 			}
 		case <-ticker.C:
 			redisPing = db.CheckRedis()

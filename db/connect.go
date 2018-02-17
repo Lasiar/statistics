@@ -59,7 +59,7 @@ func NewClick() {
 		if exception, ok := err.(*clickhouse.Exception); ok {
 			fmt.Printf("[%d] %s \n%s\n", exception.Code, exception.Message, exception.StackTrace)
 		} else {
-			fmt.Println("Clickhouse: ",err)
+			fmt.Println("Clickhouse: ", err)
 		}
 	}
 }
