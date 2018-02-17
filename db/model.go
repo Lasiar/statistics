@@ -41,7 +41,7 @@ func SetRedis(statJS lib.StatJS) (bool, error) {
 func SendToBadDB(badJsons []lib.BadJS) (bool, error) {
 	if err := lib.PsqlDB.Ping(); err != nil {
 		if exception, ok := err.(*clickhouse.Exception); ok {
-			return false, 			fmt.Errorf("[%d] %s \n%s\n", exception.Code, exception.Message, exception.StackTrace)
+			return false, fmt.Errorf("[%d] %s \n%s\n", exception.Code, exception.Message, exception.StackTrace)
 
 		} else {
 			return false, err
@@ -52,7 +52,7 @@ func SendToBadDB(badJsons []lib.BadJS) (bool, error) {
 	)
 	stmt, err := tx.Prepare(dbClickhouseBadQuery)
 	if err != nil {
-		return  false, err
+		return false, err
 	}
 	for _, query := range badJsons {
 		if _, err := stmt.Exec(query.Ip,
