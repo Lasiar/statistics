@@ -65,7 +65,7 @@ func Exit() {
 		for {
 			<-sigs
 			if !confirm("\nyou want exit?", 1) {
-				fmt.Println("okay")
+				fmt.Println("nocd")
 				continue
 			}
 			fmt.Println("finish work")

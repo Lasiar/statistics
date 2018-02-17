@@ -18,7 +18,7 @@ func NewRedisStat() {
 	})
 	_, err := lib.RedisStatDB.Ping().Result()
 	if err != nil {
-		log.Println(err)
+		log.Println("redis stat:", err)
 	}
 }
 
@@ -30,7 +30,7 @@ func NewRedisIp() {
 	})
 	_, err := lib.RedisStatDB.Ping().Result()
 	if err != nil {
-		log.Println(err)
+		log.Println("redis ip: ", err)
 	}
 }
 
@@ -44,7 +44,7 @@ func NewPostSql() {
 		if exception, ok := err.(*clickhouse.Exception); ok {
 			fmt.Printf("[%d] %s \n%s\n", exception.Code, exception.Message, exception.StackTrace)
 		} else {
-			fmt.Println(err)
+			fmt.Println("psql: ", err)
 		}
 	}
 }
@@ -59,7 +59,7 @@ func NewClick() {
 		if exception, ok := err.(*clickhouse.Exception); ok {
 			fmt.Printf("[%d] %s \n%s\n", exception.Code, exception.Message, exception.StackTrace)
 		} else {
-			fmt.Println(err)
+			fmt.Println("Clickhouse: ",err)
 		}
 	}
 }
