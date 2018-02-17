@@ -1,0 +1,87 @@
+{
+	"ImportPath": "statistics",
+	"GoVersion": "go1.10",
+	"GodepVersion": "v79",
+	"Deps": [
+		{
+			"ImportPath": "github.com/go-redis/redis",
+			"Comment": "v6.7.5",
+			"Rev": "9c885d5ba8a22f260badcffde1649915fbeebfc0"
+		},
+		{
+			"ImportPath": "github.com/go-redis/redis/internal",
+			"Comment": "v6.7.5",
+			"Rev": "9c885d5ba8a22f260badcffde1649915fbeebfc0"
+		},
+		{
+			"ImportPath": "github.com/go-redis/redis/internal/consistenthash",
+			"Comment": "v6.7.5",
+			"Rev": "9c885d5ba8a22f260badcffde1649915fbeebfc0"
+		},
+		{
+			"ImportPath": "github.com/go-redis/redis/internal/hashtag",
+			"Comment": "v6.7.5",
+			"Rev": "9c885d5ba8a22f260badcffde1649915fbeebfc0"
+		},
+		{
+			"ImportPath": "github.com/go-redis/redis/internal/pool",
+			"Comment": "v6.7.5",
+			"Rev": "9c885d5ba8a22f260badcffde1649915fbeebfc0"
+		},
+		{
+			"ImportPath": "github.com/go-redis/redis/internal/proto",
+			"Comment": "v6.7.5",
+			"Rev": "9c885d5ba8a22f260badcffde1649915fbeebfc0"
+		},
+		{
+			"ImportPath": "github.com/kshvakov/clickhouse",
+			"Comment": "v1.3.1-7-gd6c12a4",
+			"Rev": "d6c12a41b385709331299da04782a09f8f0eb869"
+		},
+		{
+			"ImportPath": "github.com/kshvakov/clickhouse/lib/binary",
+			"Comment": "v1.3.1-7-gd6c12a4",
+			"Rev": "d6c12a41b385709331299da04782a09f8f0eb869"
+		},
+		{
+			"ImportPath": "github.com/kshvakov/clickhouse/lib/column",
+			"Comment": "v1.3.1-7-gd6c12a4",
+			"Rev": "d6c12a41b385709331299da04782a09f8f0eb869"
+		},
+		{
+			"ImportPath": "github.com/kshvakov/clickhouse/lib/data",
+			"Comment": "v1.3.1-7-gd6c12a4",
+			"Rev": "d6c12a41b385709331299da04782a09f8f0eb869"
+		},
+		{
+			"ImportPath": "github.com/kshvakov/clickhouse/lib/protocol",
+			"Comment": "v1.3.1-7-gd6c12a4",
+			"Rev": "d6c12a41b385709331299da04782a09f8f0eb869"
+		},
+		{
+			"ImportPath": "github.com/kshvakov/clickhouse/lib/types",
+			"Comment": "v1.3.1-7-gd6c12a4",
+			"Rev": "d6c12a41b385709331299da04782a09f8f0eb869"
+		},
+		{
+			"ImportPath": "github.com/kshvakov/clickhouse/lib/writebuffer",
+			"Comment": "v1.3.1-7-gd6c12a4",
+			"Rev": "d6c12a41b385709331299da04782a09f8f0eb869"
+		},
+		{
+			"ImportPath": "github.com/lib/pq",
+			"Comment": "go1.0-cutoff-195-g83612a5",
+			"Rev": "83612a56d3dd153a94a629cd64925371c9adad78"
+		},
+		{
+			"ImportPath": "github.com/lib/pq/oid",
+			"Comment": "go1.0-cutoff-195-g83612a5",
+			"Rev": "83612a56d3dd153a94a629cd64925371c9adad78"
+		},
+		{
+			"ImportPath": "github.com/satori/go.uuid",
+			"Comment": "v1.1.0-8-g5bf94b6",
+			"Rev": "5bf94b69c6b68ee1b541973bb8e1144db23a194b"
+		}
+	]
+}
