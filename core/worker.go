@@ -101,7 +101,8 @@ func ParserWorker(ticker *time.Ticker, tenTicker *time.Ticker, stat chan lib.Sta
 		case s := <-statFromRedis:
 			go parser.Parse(s, returnChannel, sendInfoPoint, sendBadDB)
 		case s := <-stat:
-			go parser.ParserWithoutRedis(s, returnChannel, sendInfoPoint, sendBadDB)
+			sArr := []lib.StatJS{s}
+			go parser.Parse(sArr, returnChannel, sendInfoPoint, sendBadDB)
 		case r := <-returnChannel:
 			arrayValidJS = append(arrayValidJS, r...)
 		case <-ticker.C:
