@@ -14,6 +14,7 @@ func Config() {
 	if err != nil {
 		log.Println("Error read config: ", err, "because of this we will create it")
 		createConfig()
+		return
 	}
 	err = json.Unmarshal(file, &lib.Config)
 	if err != nil {
@@ -30,7 +31,7 @@ func createConfig() {
 	lib.Config.Redis.Address="127.0.0.1"
 	lib.Config.RedisIp.Password="qwerty"
 	lib.Config.RedisIp.Address="127.0.0.1"
-	StrBool ,err := json.Marshal(lib.Config)
+	StrBool ,err := json.MarshalIndent(lib.Config, "", "   ")
 	if err != nil {
 		log.Println(err)
 	}
