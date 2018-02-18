@@ -36,7 +36,7 @@ func SendBadJson(ticker *time.Ticker, tickerTen *time.Ticker, badJsonChann chan 
 	}
 }
 
-func ReceivingStatWorker(ticker *time.Ticker, halfTicker *time.Ticker, stat chan lib.StatJS, sendParse chan lib.StatJS, forParse chan []lib.StatJS) {
+func ReceivingStatWorker(ticker *time.Ticker, halfTicker *time.Ticker, stat chan lib.StatJS, forParse chan []lib.StatJS) {
 	redisPing := db.CheckRedis()
 	var err error
 	for {
@@ -48,7 +48,8 @@ func ReceivingStatWorker(ticker *time.Ticker, halfTicker *time.Ticker, stat chan
 					log.Println("redis stat set: ", err)
 				}
 			} else {
-				sendParse <- s
+				sArr := []lib.StatJS{s}
+				forParse <- sArr
 			}
 		case <-halfTicker.C:
 			if redisPing {
@@ -92,7 +93,7 @@ func SendRedisIp(ticker *time.Ticker, tenTicker *time.Ticker, infoPoint chan lib
 	}
 }
 
-func ParserWorker(ticker *time.Ticker, tenTicker *time.Ticker, stat chan lib.StatJS, statFromRedis chan []lib.StatJS, sendInfoPoint chan lib.InfoPoint, sendBadDB chan lib.BadJS) {
+func ParserWorker(ticker *time.Ticker, tenTicker *time.Ticker, statFromRedis chan []lib.StatJS, sendInfoPoint chan lib.InfoPoint, sendBadDB chan lib.BadJS) {
 	var arrayValidJS []lib.ValidJS
 	clickPing := db.CheckClick()
 	returnChannel := make(chan []lib.ValidJS)
@@ -100,9 +101,6 @@ func ParserWorker(ticker *time.Ticker, tenTicker *time.Ticker, stat chan lib.Sta
 		select {
 		case s := <-statFromRedis:
 			go parser.Parse(s, returnChannel, sendInfoPoint, sendBadDB)
-		case s := <-stat:
-			sArr := []lib.StatJS{s}
-			go parser.Parse(sArr, returnChannel, sendInfoPoint, sendBadDB)
 		case r := <-returnChannel:
 			arrayValidJS = append(arrayValidJS, r...)
 		case <-ticker.C:

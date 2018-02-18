@@ -27,14 +27,13 @@ func main() {
 	everHalfSecond := time.NewTicker(500 * time.Millisecond)
 
 	stat := make(chan lib.StatJS)
-	sendInParse := make(chan lib.StatJS)
 	statFromRedis := make(chan []lib.StatJS)
 	sendInfoPoint := make(chan lib.InfoPoint)
 	sendBadDB := make(chan lib.BadJS)
 
 	go core.SendRedisIp(everHalfSecond, everTenSecond, sendInfoPoint)
-	go core.ReceivingStatWorker(everTenSecond, everHalfSecond, stat, sendInParse, statFromRedis)
-	go core.ParserWorker(everSecond, everTenSecond, sendInParse, statFromRedis, sendInfoPoint, sendBadDB)
+	go core.ReceivingStatWorker(everTenSecond, everHalfSecond, stat,  statFromRedis)
+	go core.ParserWorker(everSecond, everTenSecond, statFromRedis, sendInfoPoint, sendBadDB)
 	go core.SendBadJson(everSecond, everTenSecond, sendBadDB)
 
 	HandleWeb := web.Web(stat)
