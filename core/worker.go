@@ -17,14 +17,15 @@ func SendBadJson(ticker *time.Ticker, tickerTen *time.Ticker, badJsonChann chan 
 		case s := <-badJsonChann:
 			badJsonArray = append(badJsonArray, s)
 		case <-ticker.C:
-			if len(badJsonArray) == 0 {
+			switch {
+			case len(badJsonArray) == 0:
 				continue
-			}
-			if badDBPing {
-				badDBPing, err = db.SendToBadDB(badJsonArray)
+			case badDBPing:
 				if err != nil {
-					log.Println("Send bad stat:", err)
+					log.Println("Send to bad stat: ", err)
 				}
+				badJsonArray = nil
+			case len(badJsonArray) > 950:
 				badJsonArray = nil
 			}
 		case <-tickerTen.C:
