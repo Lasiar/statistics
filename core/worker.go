@@ -73,7 +73,7 @@ func SendRedisIp(ticker *time.Ticker, tenTicker *time.Ticker, infoPoint chan lib
 		case s := <-infoPoint:
 			infoPointArray = append(infoPointArray, s)
 		case <-ticker.C:
-			switch  {
+			switch {
 			case len(infoPointArray) == 0:
 				continue
 			case redisIpPing:
@@ -105,16 +105,21 @@ func ParserWorker(ticker *time.Ticker, tenTicker *time.Ticker, stat chan lib.Sta
 		case r := <-returnChannel:
 			arrayValidJS = append(arrayValidJS, r...)
 		case <-ticker.C:
-			if len(arrayValidJS) != 0 && clickPing {
-				if err := db.SendToClick(arrayValidJS); err != nil {
-					log.Println("Send Clickhouse", err)
+			switch {
+			case len(arrayValidJS) == 0:
+				continue
+
+			case clickPing:
+				err := db.SendToClick(arrayValidJS)
+				if err != nil {
+					log.Println("Send Clickhouse: ", err)
 					continue
 				}
 				arrayValidJS = nil
-			}
-			if len(arrayValidJS) > 950 {
+			case len(arrayValidJS) > 950:
 				arrayValidJS = nil
 			}
+
 		case <-tenTicker.C:
 			clickPing = db.CheckClick()
 		}
