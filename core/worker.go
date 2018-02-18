@@ -21,11 +21,13 @@ func SendBadJson(ticker *time.Ticker, tickerTen *time.Ticker, badJsonChann chan 
 			case len(badJsonArray) == 0:
 				continue
 			case badDBPing:
+				badDBPing, err = db.SendToBadDB(badJsonArray)
 				if err != nil {
 					log.Println("Send to bad stat: ", err)
+					continue
 				}
 				badJsonArray = nil
-			case len(badJsonArray) > 950:
+			case len(badJsonArray) > 100:
 				badJsonArray = nil
 			}
 		case <-tickerTen.C:
@@ -71,14 +73,18 @@ func SendRedisIp(ticker *time.Ticker, tenTicker *time.Ticker, infoPoint chan lib
 		case s := <-infoPoint:
 			infoPointArray = append(infoPointArray, s)
 		case <-ticker.C:
-			if len(infoPointArray) != 0 && redisIpPing {
+			switch  {
+			case len(infoPointArray) == 0:
+				continue
+			case redisIpPing:
 				redisIpPing, err = db.SendInfo(infoPointArray)
-				if redisIpPing {
-					infoPointArray = nil
-				}
 				if err != nil {
 					log.Println("Error send ip add: ", err)
+					continue
 				}
+				infoPointArray = nil
+			case len(infoPointArray) > 100:
+				infoPointArray = nil
 			}
 		case <-tenTicker.C:
 			redisIpPing = db.CheckIpRedis()
