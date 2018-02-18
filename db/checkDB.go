@@ -1,10 +1,10 @@
-package	db
+package db
 
 import (
-	"github.com/kshvakov/clickhouse"
 	"fmt"
-	"statistics/lib"
+	"github.com/kshvakov/clickhouse"
 	"log"
+	"statistics/lib"
 )
 
 func CheckRedis() bool {

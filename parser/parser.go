@@ -14,8 +14,8 @@ func Parse(statArray []lib.StatJS, statChannel chan []lib.ValidJS, sendInfoPoint
 	for _, stat := range statArray {
 		js, err := unmarshalJS(stat.Json)
 		if err != nil {
-			log.Println("Error: "," ip addr: " , stat.Info.Addr, " user info: ", stat.Info.Uagent, " json: ", stat.Json  ,err)
-			sendBadDB  <- system.MakeBadJS(stat)
+			log.Println("Error: ", " ip addr: ", stat.Info.Addr, " user info: ", stat.Info.Uagent, " json: ", stat.Json, err)
+			sendBadDB <- system.MakeBadJS(stat)
 			return
 		}
 
@@ -23,25 +23,25 @@ func Parse(statArray []lib.StatJS, statChannel chan []lib.ValidJS, sendInfoPoint
 
 		err = validInterfaceJS(js.Statistics)
 		if err != nil {
-			log.Println("Error: "," ip addr: " , stat.Info.Addr, " user info: ", stat.Info.Uagent, " json: ", stat.Json  ,err)
-			sendBadDB  <- system.MakeBadJS(stat)
+			log.Println("Error: ", " ip addr: ", stat.Info.Addr, " user info: ", stat.Info.Uagent, " json: ", stat.Json, err)
+			sendBadDB <- system.MakeBadJS(stat)
 			return
 		}
 		readyJs, err := changeType(js)
 		if err != nil {
-			log.Println("Error: "," ip addr: " , stat.Info.Addr, " user info: ", stat.Info.Uagent, " json: ", stat.Json  ,err)
-			sendBadDB  <- system.MakeBadJS(stat)
+			log.Println("Error: ", " ip addr: ", stat.Info.Addr, " user info: ", stat.Info.Uagent, " json: ", stat.Json, err)
+			sendBadDB <- system.MakeBadJS(stat)
 			return
 		}
 		statChannel <- readyJs
 	}
 }
 
-func ParserWithoutRedis(stat lib.StatJS, statChannel chan []lib.ValidJS, sendInfoPoint chan lib.InfoPoint,sendBadDB chan lib.BadJS) {
+func ParserWithoutRedis(stat lib.StatJS, statChannel chan []lib.ValidJS, sendInfoPoint chan lib.InfoPoint, sendBadDB chan lib.BadJS) {
 	js, err := unmarshalJS(stat.Json)
 	if err != nil {
-		log.Println("Error: "," ip addr: " , stat.Info.Addr, " user info: ", stat.Info.Uagent, " json: ", stat.Json  ,err)
-		sendBadDB  <- system.MakeBadJS(stat)
+		log.Println("Error: ", " ip addr: ", stat.Info.Addr, " user info: ", stat.Info.Uagent, " json: ", stat.Json, err)
+		sendBadDB <- system.MakeBadJS(stat)
 		return
 	}
 
@@ -50,14 +50,14 @@ func ParserWithoutRedis(stat lib.StatJS, statChannel chan []lib.ValidJS, sendInf
 
 	err = validInterfaceJS(js.Statistics)
 	if err != nil {
-		log.Println("Error: "," ip addr: " , stat.Info.Addr, " user info: ", stat.Info.Uagent, " json: ", stat.Json  ,err)
-		sendBadDB  <- system.MakeBadJS(stat)
+		log.Println("Error: ", " ip addr: ", stat.Info.Addr, " user info: ", stat.Info.Uagent, " json: ", stat.Json, err)
+		sendBadDB <- system.MakeBadJS(stat)
 		return
 	}
 	readyJs, err := changeType(js)
 	if err != nil {
-		log.Println("Error: "," ip addr: " , stat.Info.Addr, " user info: ", stat.Info.Uagent, " json: ", stat.Json  ,err)
-		sendBadDB  <- system.MakeBadJS(stat)
+		log.Println("Error: ", " ip addr: ", stat.Info.Addr, " user info: ", stat.Info.Uagent, " json: ", stat.Json, err)
+		sendBadDB <- system.MakeBadJS(stat)
 		return
 	}
 	statChannel <- readyJs

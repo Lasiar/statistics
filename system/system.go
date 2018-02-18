@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"statistics/lib"
 
+	"bufio"
+	"log"
 	"os"
 	"os/signal"
-	"syscall"
-	"bufio"
 	"strings"
-	"log"
+	"syscall"
 )
 
 func CheckString(v interface{}) (string, error) {

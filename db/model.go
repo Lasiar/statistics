@@ -15,41 +15,36 @@ const (
 	dbClickhouseBadQuery  = `INSERT INTO badjson(ip, json) VALUES ($1, $2)`
 )
 
-
-
 func SendInfo(infoPointArr []lib.InfoPoint) (bool, error) {
 	for _, infoPoint := range infoPointArr {
 		err := lib.RedisIpDB.Set(fmt.Sprint(infoPoint.Point, "_ip"), infoPoint.Addr, 0).Err()
 		if err != nil {
-			log.Println("Redis set ip: ", err)
-			return false, err
+			return false, fmt.Errorf("%v %v: ", "Set ip addr", err)
 		}
 		err = lib.RedisIpDB.Set(fmt.Sprint(infoPoint.Point, "_user"), infoPoint.Uagent, 0).Err()
 		if err != nil {
-			log.Println("Redis set uagent: ", err)
-			return false, err
+			return false, fmt.Errorf("%v %v: ", "Set uagent", err)
 		}
 	}
 	return true, nil
 }
 
-func SetRedis(statJS lib.StatJS) bool {
+func SetRedis(statJS lib.StatJS) (bool, error) {
 	id := uuid.NewV4()
 	err := lib.RedisStatDB.Set(fmt.Sprint(id, "_ip:", statJS.Info.Addr, "user_agent:", statJS.Info.Uagent), statJS.Json, 0).Err()
 	if err != nil {
-		log.Println("Redis set stat: ", err)
-		return false
+		return false, fmt.Errorf("%v %v: ", "Set stat", err)
 	}
-	return true
+	return true, nil
 }
 
-func SendToBadDB(badJsons []lib.BadJS) bool {
+func SendToBadDB(badJsons []lib.BadJS) (bool, error) {
 	if err := lib.PsqlDB.Ping(); err != nil {
 		if exception, ok := err.(*clickhouse.Exception); ok {
-			fmt.Printf("[%d] %s \n%s\n", exception.Code, exception.Message, exception.StackTrace)
-			return false
+			return false, fmt.Errorf("[%d] %s \n%s\n", exception.Code, exception.Message, exception.StackTrace)
+
 		} else {
-			return false
+			return false, err
 		}
 	}
 	var (
@@ -57,20 +52,18 @@ func SendToBadDB(badJsons []lib.BadJS) bool {
 	)
 	stmt, err := tx.Prepare(dbClickhouseBadQuery)
 	if err != nil {
-		log.Println(err)
+		return false, err
 	}
 	for _, query := range badJsons {
 		if _, err := stmt.Exec(query.Ip,
 			query.Json); err != nil {
-			log.Println(err)
-			return false
+			return false, err
 		}
 	}
 	if err := tx.Commit(); err != nil {
-		log.Println(err)
-		return false
+		return false, err
 	}
-	return true
+	return true, nil
 }
 
 func SendToClick(array []lib.ValidJS) error {
@@ -106,21 +99,20 @@ func SendToClick(array []lib.ValidJS) error {
 	return nil
 }
 
-func GetStatFromRedis(toParse chan []lib.StatJS) {
+func GetStatFromRedis(toParse chan []lib.StatJS) error {
 	var statArray []lib.StatJS
 	var stat lib.StatJS
 
 	KeyDB, err := lib.RedisStatDB.Keys("*ip:*").Result()
 	if err != nil {
-		log.Println(err)
+		return err
 	}
 	if len(KeyDB) == 0 {
-		return
+		return nil
 	}
 	valArr, err := lib.RedisStatDB.MGet(KeyDB...).Result()
 	if err != nil {
-		log.Println(err)
-		return
+		return err
 	}
 	for i, val := range valArr {
 		d := strings.Index(KeyDB[i], "ip:")
@@ -129,16 +121,16 @@ func GetStatFromRedis(toParse chan []lib.StatJS) {
 		stat.Info.Uagent = KeyDB[i][u+11:]
 		stat.Json, err = system.CheckString(val)
 		if err != nil {
-			log.Println(err)
-			return
+			return err
 		}
 		statArray = append(statArray, stat)
 	}
 	lib.RedisStatDB.Del(KeyDB...).Err()
 	if err != nil {
-		log.Println(err)
+		return err
 	}
 	toParse <- statArray
+	return nil
 }
 
 /*
