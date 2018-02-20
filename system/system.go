@@ -5,12 +5,12 @@ import (
 	"statistics/lib"
 
 	"bufio"
+	"github.com/satori/go.uuid"
 	"log"
 	"os"
 	"os/signal"
 	"strings"
 	"syscall"
-	"github.com/satori/go.uuid"
 )
 
 func CheckString(v interface{}) (string, error) {
@@ -30,8 +30,8 @@ func MakeInfoPoint(js lib.RawJS, statJS lib.StatJS) lib.InfoPoint {
 	return inf
 }
 
-func GenUUID(){
-	lib.UUID =uuid.NewV4().String()
+func GenUUID() {
+	lib.UUID = uuid.NewV4().String()
 }
 
 func MakeBadJS(stat lib.StatJS) lib.BadJS {

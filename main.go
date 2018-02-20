@@ -14,12 +14,13 @@ import (
 
 func init() {
 	configure.Config()
-	system.Exit()
-	system.GenUUID()
-	db.NewRedisStat()
 	db.NewRedisIp()
 	db.NewClick()
 	db.NewPostSql()
+	system.Exit()
+	system.GenUUID()
+	db.NewRedisStat()
+
 }
 
 func main() {
@@ -33,7 +34,7 @@ func main() {
 	sendBadDB := make(chan lib.BadJS)
 
 	go core.SendRedisIp(everHalfSecond, everTenSecond, sendInfoPoint)
-	go core.ReceivingStatWorker(everTenSecond, everHalfSecond, stat,  statFromRedis)
+	go core.ReceivingStatWorker(everTenSecond, everHalfSecond, stat, statFromRedis)
 	go core.ParserWorker(everSecond, everTenSecond, statFromRedis, sendInfoPoint, sendBadDB)
 	go core.SendBadJson(everSecond, everTenSecond, sendBadDB)
 

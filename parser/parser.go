@@ -37,7 +37,6 @@ func Parse(statArray []lib.StatJS, statChannel chan []lib.ValidJS, sendInfoPoint
 	}
 }
 
-
 func unmarshalJS(js string) (lib.RawJS, error) {
 	var rawJson lib.RawJS
 	jsBool := []byte(js)
