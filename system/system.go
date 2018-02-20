@@ -10,6 +10,7 @@ import (
 	"os/signal"
 	"strings"
 	"syscall"
+	"github.com/satori/go.uuid"
 )
 
 func CheckString(v interface{}) (string, error) {
@@ -27,6 +28,10 @@ func MakeInfoPoint(js lib.RawJS, statJS lib.StatJS) lib.InfoPoint {
 	inf.Addr = statJS.Info.Addr
 	inf.Uagent = statJS.Info.Uagent
 	return inf
+}
+
+func GenUUID(){
+	lib.UUID =uuid.NewV4().String()
 }
 
 func MakeBadJS(stat lib.StatJS) lib.BadJS {

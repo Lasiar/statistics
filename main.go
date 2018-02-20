@@ -15,6 +15,7 @@ import (
 func init() {
 	configure.Config()
 	system.Exit()
+	system.GenUUID()
 	db.NewRedisStat()
 	db.NewRedisIp()
 	db.NewClick()

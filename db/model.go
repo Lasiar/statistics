@@ -30,8 +30,8 @@ func SendInfo(infoPointArr []lib.InfoPoint) (bool, error) {
 }
 
 func SetRedis(statJS lib.StatJS) (bool, error) {
-	id := uuid.NewV4()
-	err := lib.RedisStatDB.Set(fmt.Sprint(id, "_ip:", statJS.Info.Addr, "user_agent:", statJS.Info.Uagent), statJS.Json, 0).Err()
+	id := uuid.NewV4().String()
+	err := lib.RedisStatDB.Set("UUID_app:_"+lib.UUID+"_"+id+"_ip:"+ statJS.Info.Addr+"user_agent:"+statJS.Info.Uagent, statJS.Json, 0).Err()
 	if err != nil {
 		return false, fmt.Errorf("%v %v: ", "Set stat", err)
 	}
@@ -102,8 +102,7 @@ func SendToClick(array []lib.ValidJS) error {
 func GetStatFromRedis(toParse chan []lib.StatJS) error {
 	var statArray []lib.StatJS
 	var stat lib.StatJS
-
-	KeyDB, err := lib.RedisStatDB.Keys("*ip:*").Result()
+	KeyDB, err := lib.RedisStatDB.Keys("UUID_app:_"+lib.UUID+"*ip:*").Result()
 	if err != nil {
 		return err
 	}

@@ -11,4 +11,6 @@ var (
 	Config      Configure
 	ClickDB     *sql.DB
 	PsqlDB      *sql.DB
+	UUID		string
 )
+
