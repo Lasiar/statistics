@@ -37,31 +37,6 @@ func Parse(statArray []lib.StatJS, statChannel chan []lib.ValidJS, sendInfoPoint
 	}
 }
 
-func ParserWithoutRedis(stat lib.StatJS, statChannel chan []lib.ValidJS, sendInfoPoint chan lib.InfoPoint, sendBadDB chan lib.BadJS) {
-	js, err := unmarshalJS(stat.Json)
-	if err != nil {
-		log.Println("Error: ", " ip addr: ", stat.Info.Addr, " user info: ", stat.Info.Uagent, " json: ", stat.Json, err)
-		sendBadDB <- system.MakeBadJS(stat)
-		return
-	}
-
-	infoPoint := system.MakeInfoPoint(js, stat)
-	sendInfoPoint <- infoPoint
-
-	err = validInterfaceJS(js.Statistics)
-	if err != nil {
-		log.Println("Error: ", " ip addr: ", stat.Info.Addr, " user info: ", stat.Info.Uagent, " json: ", stat.Json, err)
-		sendBadDB <- system.MakeBadJS(stat)
-		return
-	}
-	readyJs, err := changeType(js)
-	if err != nil {
-		log.Println("Error: ", " ip addr: ", stat.Info.Addr, " user info: ", stat.Info.Uagent, " json: ", stat.Json, err)
-		sendBadDB <- system.MakeBadJS(stat)
-		return
-	}
-	statChannel <- readyJs
-}
 
 func unmarshalJS(js string) (lib.RawJS, error) {
 	var rawJson lib.RawJS
@@ -106,7 +81,6 @@ func validInterfaceJS(JSArray [][]interface{}) error {
 			}
 		}
 	}
-
 	return nil
 }
 
