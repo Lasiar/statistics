@@ -63,8 +63,21 @@ func confirm(s string, tries int) bool {
 	return false
 }
 
+func
+
+CountInClick(sendInClick chan int) {
+	go func() {
+		for {
+			select {
+			case s := <-sendInClick:
+				lib.Count = lib.Count + uint64(s)	
+			}
+		}
+	}()
+}
+
 func Exit() {
-	sigs := make(chan os.Signal, 1)
+	sigs := make(chan os.Signal, 9)
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 	go func() {
 		for {

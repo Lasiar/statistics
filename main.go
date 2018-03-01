@@ -38,8 +38,10 @@ func main() {
 	sendInfoPoint := make(chan lib.InfoPoint)
 	sendBadDB := make(chan lib.BadJS)
 	validJS := make(chan []lib.ValidJS)
+	countChan := make(chan int)
 
-	go core.SendClick(everSecondForClick, validJS)
+	system.CountInClick(countChan)
+	go core.SendClick(everSecondForClick, validJS, countChan)
 	go core.SendRedisIp(everHalfSecond, everTenSecond, sendInfoPoint)
 	go core.ReceivingStatWorker(everTenSecond1, everHalfSecond2, stat, statFromRedis)
 	go core.ParserWorker(everSecond, statFromRedis, sendInfoPoint, sendBadDB, validJS)
@@ -47,6 +49,7 @@ func main() {
 
 	HandleWeb := web.Web(stat)
 
+	http.HandleFunc("/gateway/statistics/count",web.Count )
 	http.HandleFunc("/gateway/statistics/create", HandleWeb)
 	http.ListenAndServe(lib.Config.Port, nil)
 	fmt.Println("Listen: ", lib.Config.Port)

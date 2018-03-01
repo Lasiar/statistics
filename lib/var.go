@@ -12,4 +12,5 @@ var (
 	ClickDB     *sql.DB
 	PsqlDB      *sql.DB
 	UUID        string
+	Count		uint64
 )

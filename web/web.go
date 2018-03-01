@@ -19,6 +19,10 @@ func Web(stat chan lib.StatJS) func(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func Count(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprint(w, lib.Count)
+}
+
 func getRealAddr(r *http.Request) string {
 	remoteIP := ""
 	if parts := strings.Split(r.RemoteAddr, ":"); len(parts) == 2 {

@@ -119,7 +119,7 @@ func ParserWorker(ticker *time.Ticker, statFromRedis chan []lib.StatJS, sendInfo
 	}
 }
 
-func SendClick(ticker *time.Ticker, validJS chan []lib.ValidJS) {
+func SendClick(ticker *time.Ticker, validJS chan []lib.ValidJS, count chan int) {
 	var arrayValidJS []lib.ValidJS
 	clickPing := db.CheckClick()
 
@@ -137,6 +137,7 @@ func SendClick(ticker *time.Ticker, validJS chan []lib.ValidJS) {
 					continue
 				}
 			}
+			count <- len(arrayValidJS)
 			arrayValidJS = nil
 			if len(arrayValidJS) > 950 {
 				arrayValidJS = nil
@@ -156,6 +157,7 @@ func SendClick(ticker *time.Ticker, validJS chan []lib.ValidJS) {
 						continue
 					}
 				}
+				count <- len(arrayValidJS)
 				arrayValidJS = nil
 				if len(arrayValidJS) > 950 {
 					arrayValidJS = nil
