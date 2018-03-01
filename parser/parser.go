@@ -10,13 +10,14 @@ import (
 	"strings"
 )
 
-func Parse(statArray []lib.StatJS, statChannel chan []lib.ValidJS, sendInfoPoint chan lib.InfoPoint, sendBadDB chan lib.BadJS) {
+func Parse(statArray []lib.StatJS, sendInfoPoint chan lib.InfoPoint, sendBadDB chan lib.BadJS) []lib.ValidJS {
+	var readyJSArr []lib.ValidJS
 	for _, stat := range statArray {
 		js, err := unmarshalJS(stat.Json)
 		if err != nil {
 			log.Println("Error: ", " ip addr: ", stat.Info.Addr, " user info: ", stat.Info.Uagent, " json: ", stat.Json, err)
 			sendBadDB <- system.MakeBadJS(stat)
-			return
+			return nil
 		}
 
 		sendInfoPoint <- system.MakeInfoPoint(js, stat)
@@ -25,18 +26,21 @@ func Parse(statArray []lib.StatJS, statChannel chan []lib.ValidJS, sendInfoPoint
 		if err != nil {
 			log.Println("Error: ", " ip addr: ", stat.Info.Addr, " user info: ", stat.Info.Uagent, " json: ", stat.Json, err)
 			sendBadDB <- system.MakeBadJS(stat)
-			return
+			return nil
 		}
 		readyJs, err := changeType(js)
 		if err != nil {
 			log.Println("Error: ", " ip addr: ", stat.Info.Addr, " user info: ", stat.Info.Uagent, " json: ", stat.Json, err)
 			sendBadDB <- system.MakeBadJS(stat)
-			return
+			return nil
 		}
-		statChannel <- readyJs
+		if len(readyJs) != 0 {
+			readyJSArr = append(readyJSArr, readyJs...)
+		}
 	}
-}
+	return readyJSArr
 
+}
 
 func unmarshalJS(js string) (lib.RawJS, error) {
 	var rawJson lib.RawJS

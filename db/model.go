@@ -95,7 +95,6 @@ func SendToClick(array []lib.ValidJS) error {
 		log.Println(err)
 		return err
 	}
-
 	return nil
 }
 
@@ -129,6 +128,7 @@ func GetStatFromRedis(toParse chan []lib.StatJS) error {
 	if err != nil {
 		return err
 	}
+	fmt.Println()
 	toParse <- statArray
 	return nil
 }
