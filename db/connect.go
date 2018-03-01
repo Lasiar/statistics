@@ -28,9 +28,9 @@ func NewRedisIp() {
 		Password: lib.Config.RedisIp.Password, // no password set
 		DB:       0,                           // use default DB
 	})
-	_, err := lib.RedisStatDB.Ping().Result()
+	_, err := lib.RedisIpDB.Ping().Result()
 	if err != nil {
-		log.Println("redis ip: ", err)
+		log.Println("redis ip:", err)
 	}
 
 }

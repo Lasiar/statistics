@@ -45,7 +45,6 @@ func main() {
 	go core.ParserWorker(everSecond, statFromRedis, sendInfoPoint, sendBadDB, validJS)
 	go core.SendBadJson(everSecond1, everTenSecond2, sendBadDB)
 
-
 	HandleWeb := web.Web(stat)
 
 	http.HandleFunc("/gateway/statistics/create", HandleWeb)
