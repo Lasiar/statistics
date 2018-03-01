@@ -107,13 +107,13 @@ func ParserWorker(ticker *time.Ticker, statFromRedis chan []lib.StatJS, sendInfo
 		default:
 			select {
 			case s := <-statFromRedis:
-					arrayValidJS = append(arrayValidJS, parser.Parse(s, sendInfoPoint, sendBadDB)...)
+				arrayValidJS = append(arrayValidJS, parser.Parse(s, sendInfoPoint, sendBadDB)...)
 			case <-ticker.C:
 
 				if len(arrayValidJS) != 0 {
 					validJS <- arrayValidJS
 					arrayValidJS = nil
-					}
+				}
 			}
 		}
 	}
