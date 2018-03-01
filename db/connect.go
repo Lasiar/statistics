@@ -32,13 +32,14 @@ func NewRedisIp() {
 	if err != nil {
 		log.Println("redis ip: ", err)
 	}
+
 }
 
 func NewPostSql() {
 	var err error
 	lib.PsqlDB, err = sql.Open("postgres", lib.Config.Psql)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 	}
 	if err := lib.PsqlDB.Ping(); err != nil {
 		if exception, ok := err.(*clickhouse.Exception); ok {
@@ -47,6 +48,7 @@ func NewPostSql() {
 			fmt.Println("psql: ", err)
 		}
 	}
+
 }
 
 func NewClick() {
@@ -62,4 +64,5 @@ func NewClick() {
 			fmt.Println("Clickhouse: ", err)
 		}
 	}
+
 }

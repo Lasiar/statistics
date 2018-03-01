@@ -39,7 +39,6 @@ func Parse(statArray []lib.StatJS, sendInfoPoint chan lib.InfoPoint, sendBadDB c
 		}
 	}
 	return readyJSArr
-
 }
 
 func unmarshalJS(js string) (lib.RawJS, error) {

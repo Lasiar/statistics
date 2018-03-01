@@ -5,6 +5,7 @@ import (
 	"statistics/lib"
 
 	"bufio"
+	"github.com/satori/go.uuid"
 	"log"
 	"os"
 	"os/signal"
@@ -27,6 +28,10 @@ func MakeInfoPoint(js lib.RawJS, statJS lib.StatJS) lib.InfoPoint {
 	inf.Addr = statJS.Info.Addr
 	inf.Uagent = statJS.Info.Uagent
 	return inf
+}
+
+func GenUUID() {
+	lib.UUID = uuid.NewV4().String()
 }
 
 func MakeBadJS(stat lib.StatJS) lib.BadJS {

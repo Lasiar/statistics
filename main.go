@@ -14,11 +14,13 @@ import (
 
 func init() {
 	configure.Config()
-	system.Exit()
-	db.NewRedisStat()
 	db.NewRedisIp()
 	db.NewClick()
 	db.NewPostSql()
+	system.Exit()
+	system.GenUUID()
+	db.NewRedisStat()
+
 }
 
 func main() {
@@ -42,6 +44,7 @@ func main() {
 	go core.ReceivingStatWorker(everTenSecond1, everHalfSecond2, stat, statFromRedis)
 	go core.ParserWorker(everSecond, statFromRedis, sendInfoPoint, sendBadDB, validJS)
 	go core.SendBadJson(everSecond1, everTenSecond2, sendBadDB)
+
 
 	HandleWeb := web.Web(stat)
 
