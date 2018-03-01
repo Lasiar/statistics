@@ -93,34 +93,76 @@ func SendRedisIp(ticker *time.Ticker, tenTicker *time.Ticker, infoPoint chan lib
 	}
 }
 
-func ParserWorker(ticker *time.Ticker, tenTicker *time.Ticker, statFromRedis chan []lib.StatJS, sendInfoPoint chan lib.InfoPoint, sendBadDB chan lib.BadJS) {
+func ParserWorker(ticker *time.Ticker, statFromRedis chan []lib.StatJS, sendInfoPoint chan lib.InfoPoint, sendBadDB chan lib.BadJS, validJS chan []lib.ValidJS) {
 	var arrayValidJS []lib.ValidJS
-	clickPing := db.CheckClick()
-	returnChannel := make(chan []lib.ValidJS)
 	for {
 		select {
-		case s := <-statFromRedis:
-			go parser.Parse(s, returnChannel, sendInfoPoint, sendBadDB)
-		case r := <-returnChannel:
-			arrayValidJS = append(arrayValidJS, r...)
 		case <-ticker.C:
-			switch {
-			case len(arrayValidJS) == 0:
-				continue
 
-			case clickPing:
+			if len(arrayValidJS) == 0 {
+				continue
+			}
+			validJS <- arrayValidJS
+			arrayValidJS = nil
+		default:
+			select {
+			case s := <-statFromRedis:
+					arrayValidJS = append(arrayValidJS, parser.Parse(s, sendInfoPoint, sendBadDB)...)
+			case <-ticker.C:
+
+				if len(arrayValidJS) != 0 {
+					validJS <- arrayValidJS
+					arrayValidJS = nil
+					}
+			}
+		}
+	}
+}
+
+func SendClick(ticker *time.Ticker, validJS chan []lib.ValidJS) {
+	var arrayValidJS []lib.ValidJS
+	clickPing := db.CheckClick()
+
+	for {
+		select {
+		case <-ticker.C:
+			if len(arrayValidJS) == 0 {
+				continue
+			}
+
+			if clickPing {
 				err := db.SendToClick(arrayValidJS)
 				if err != nil {
 					log.Println("Send Clickhouse: ", err)
 					continue
 				}
-				arrayValidJS = nil
-			case len(arrayValidJS) > 950:
+			}
+			arrayValidJS = nil
+			if len(arrayValidJS) > 950 {
 				arrayValidJS = nil
 			}
+			continue
+		default:
+			select {
+			case <-ticker.C:
 
-		case <-tenTicker.C:
-			clickPing = db.CheckClick()
+				if len(arrayValidJS) == 0 {
+					continue
+				}
+				if clickPing {
+					err := db.SendToClick(arrayValidJS)
+					if err != nil {
+						log.Println("Send Clickhouse: ", err)
+						continue
+					}
+				}
+				arrayValidJS = nil
+				if len(arrayValidJS) > 950 {
+					arrayValidJS = nil
+				}
+			case a := <-validJS:
+				arrayValidJS = append(arrayValidJS, a...)
+			}
 		}
 	}
 }
