@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"statistics/lib"
-	"os"
 	"log"
+	"os"
+	"statistics/lib"
 )
 
 func Config() {
@@ -27,11 +27,11 @@ func createConfig() {
 	lib.Config.Port = ":8080"
 	lib.Config.Psql = "user=psql_dbname=dbname password=qwerty host=127.0.0.1"
 	lib.Config.Clickhouse = "tcp://127.0.0.1:9000?database=stat"
-	lib.Config.Redis.Password="qwerty"
-	lib.Config.Redis.Address="127.0.0.1"
-	lib.Config.RedisIp.Password="qwerty"
-	lib.Config.RedisIp.Address="127.0.0.1"
-	StrBool ,err := json.MarshalIndent(lib.Config, "", "   ")
+	lib.Config.Redis.Password = "qwerty"
+	lib.Config.Redis.Address = "127.0.0.1"
+	lib.Config.RedisIp.Password = "qwerty"
+	lib.Config.RedisIp.Address = "127.0.0.1"
+	StrBool, err := json.MarshalIndent(lib.Config, "", "   ")
 	if err != nil {
 		log.Println(err)
 	}
