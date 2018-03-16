@@ -36,12 +36,13 @@ func SendBadJson(ticker *time.Ticker, tickerTen *time.Ticker, badJsonChann chan 
 	}
 }
 
-func ReceivingStatWorker(ticker *time.Ticker, halfTicker *time.Ticker, stat chan lib.StatJS, forParse chan []lib.StatJS) {
+func ReceivingStatWorker(ticker *time.Ticker, halfTicker *time.Ticker, stat chan lib.StatJS, forParse chan []lib.StatJS, count chan int) {
 	redisPing := db.CheckRedis()
 	var err error
 	for {
 		select {
 		case s := <-stat:
+			count <- 1
 			if redisPing {
 				redisPing, err = db.SetRedis(s)
 				if err != nil {
@@ -98,7 +99,6 @@ func ParserWorker(ticker *time.Ticker, statFromRedis chan []lib.StatJS, sendInfo
 	for {
 		select {
 		case <-ticker.C:
-
 			if len(arrayValidJS) == 0 {
 				continue
 			}
