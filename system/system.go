@@ -5,6 +5,7 @@ import (
 	"statistics/lib"
 
 	"bufio"
+	"github.com/satori/go.uuid"
 	"log"
 	"os"
 	"os/signal"
@@ -27,6 +28,10 @@ func MakeInfoPoint(js lib.RawJS, statJS lib.StatJS) lib.InfoPoint {
 	inf.Addr = statJS.Info.Addr
 	inf.Uagent = statJS.Info.Uagent
 	return inf
+}
+
+func GenUUID() {
+	lib.UUID = uuid.NewV4().String()
 }
 
 func MakeBadJS(stat lib.StatJS) lib.BadJS {
@@ -58,8 +63,21 @@ func confirm(s string, tries int) bool {
 	return false
 }
 
+func
+
+CountInClick(sendInClick chan int) {
+	go func() {
+		for {
+			select {
+			case s := <-sendInClick:
+				lib.Count = lib.Count + uint64(s)
+			}
+		}
+	}()
+}
+
 func Exit() {
-	sigs := make(chan os.Signal, 1)
+	sigs := make(chan os.Signal, 9)
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 	go func() {
 		for {

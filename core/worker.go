@@ -36,12 +36,13 @@ func SendBadJson(ticker *time.Ticker, tickerTen *time.Ticker, badJsonChann chan 
 	}
 }
 
-func ReceivingStatWorker(ticker *time.Ticker, halfTicker *time.Ticker, stat chan lib.StatJS, forParse chan []lib.StatJS) {
+func ReceivingStatWorker(ticker *time.Ticker, halfTicker *time.Ticker, stat chan lib.StatJS, forParse chan []lib.StatJS, count chan int) {
 	redisPing := db.CheckRedis()
 	var err error
 	for {
 		select {
 		case s := <-stat:
+			count <- 1
 			if redisPing {
 				redisPing, err = db.SetRedis(s)
 				if err != nil {
@@ -55,7 +56,7 @@ func ReceivingStatWorker(ticker *time.Ticker, halfTicker *time.Ticker, stat chan
 			if redisPing {
 				err = db.GetStatFromRedis(forParse)
 				if err != nil {
-					log.Println("redis get stat:")
+					log.Println("redis get stat:", err)
 				}
 			}
 		case <-ticker.C:
@@ -98,7 +99,6 @@ func ParserWorker(ticker *time.Ticker, statFromRedis chan []lib.StatJS, sendInfo
 	for {
 		select {
 		case <-ticker.C:
-
 			if len(arrayValidJS) == 0 {
 				continue
 			}
@@ -107,13 +107,13 @@ func ParserWorker(ticker *time.Ticker, statFromRedis chan []lib.StatJS, sendInfo
 		default:
 			select {
 			case s := <-statFromRedis:
-					arrayValidJS = append(arrayValidJS, parser.Parse(s, sendInfoPoint, sendBadDB)...)
+				arrayValidJS = append(arrayValidJS, parser.Parse(s, sendInfoPoint, sendBadDB)...)
 			case <-ticker.C:
 
 				if len(arrayValidJS) != 0 {
 					validJS <- arrayValidJS
 					arrayValidJS = nil
-					}
+				}
 			}
 		}
 	}

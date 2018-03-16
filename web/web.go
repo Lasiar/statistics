@@ -11,12 +11,16 @@ import (
 func Web(stat chan lib.StatJS) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var statJS lib.StatJS
-		fmt.Fprint(w, `{"success":true}`)
 		statJS.Json = r.PostFormValue("data")
 		statJS.Info.Addr = getRealAddr(r)
 		statJS.Info.Uagent = r.UserAgent()
 		stat <- statJS
+		fmt.Fprint(w, `{"success":true}`)
 	}
+}
+
+func Count(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprint(w, lib.Count)
 }
 
 func getRealAddr(r *http.Request) string {
