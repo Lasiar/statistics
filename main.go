@@ -20,7 +20,6 @@ func init() {
 	system.Exit()
 	system.GenUUID()
 	db.NewRedisStat()
-
 }
 
 func main() {
@@ -41,9 +40,9 @@ func main() {
 	countChan := make(chan int)
 
 	system.CountInClick(countChan)
-	go core.SendClick(everSecondForClick, validJS, countChan)
+	go core.SendClick(everSecondForClick, validJS)
 	go core.SendRedisIp(everHalfSecond, everTenSecond, sendInfoPoint)
-	go core.ReceivingStatWorker(everTenSecond1, everHalfSecond2, stat, statFromRedis)
+	go core.ReceivingStatWorker(everTenSecond1, everHalfSecond2, stat, statFromRedis, countChan)
 	go core.ParserWorker(everSecond, statFromRedis, sendInfoPoint, sendBadDB, validJS)
 	go core.SendBadJson(everSecond1, everTenSecond2, sendBadDB)
 

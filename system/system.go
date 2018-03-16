@@ -70,7 +70,7 @@ CountInClick(sendInClick chan int) {
 		for {
 			select {
 			case s := <-sendInClick:
-				lib.Count = lib.Count + uint64(s)	
+				lib.Count = lib.Count + uint64(s)
 			}
 		}
 	}()
